@@ -1,0 +1,34 @@
+﻿<Page
+    x:Class="VideoRecordingCC.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:VideoRecordingCC">
+
+    <Grid Background="#1E1E1E">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <CaptureElement Name="PreviewControl" Stretch="UniformToFill"/>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10">
+            <Button Name="RecordButton" Content="Start Recording" Click="RecordButton_Click" Background="#FF4081" Foreground="White" Margin="5"/>
+            <Button Name="FlipButton" Content="Flip Camera" Click="FlipCamera_Click" Background="#3F51B5" Foreground="White" Margin="5"/>
+            <ToggleButton x:Name="AudioToggleButton" Content="Enable Audio" Click="AudioToggleButton_Click" Background="#009688" Foreground="White" Margin="5"/>
+            <Button Name="MenuButton" Background="Transparent" Foreground="White" Margin="5">
+                <TextBlock Text="&#x22EE;" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button.Flyout>
+                    <MenuFlyout>
+                        <MenuFlyoutItem Text="Settings" Click="OpenSettingsButton_Click"/>
+                        <MenuFlyoutItem Text="Edit Video" Click="EditVideoButton_Click"/>
+                        <!-- Add other menu items here -->
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+
+        <!--<Button Name="OpenSettingsButton" Content="Settings" Click="OpenSettingsButton_Click"/>-->
+            <!--<Button Name="ComposeButton" Content="Compose Media" Click="ComposeButton_Click" Background="#607D8B" Foreground="White" Margin="5"/>-->
+        </StackPanel>
+    </Grid>
+</Page>
