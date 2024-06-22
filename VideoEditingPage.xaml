@@ -9,19 +9,49 @@
 
     <Grid Background="#1E1E1E">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <MediaPlayerElement Name="PreviewControl" Stretch="UniformToFill" Grid.Row="0"/>
-        <Slider x:Name="SeekBar" VerticalAlignment="Bottom" Margin="10" Minimum="0" Maximum="1000" ValueChanged="SeekBar_ValueChanged"/>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10">
-            <Button Name="TrimButton" Content="Trim" Click="TrimButton_Click" Background="#FF4081" Foreground="White" Margin="5"/>
-            <Button Name="AdjustSpeedButton" Content="Adjust Speed" Click="AdjustSpeedButton_Click" Background="#009688" Foreground="White" Margin="5"/>
-            <Button Content="Pause" Click="PauseButton_Click"/>
-            <Button Content="Resume" Click="ResumeButton_Click"/>
-            <Button Content="Play from Start" Click="PlayFromStartButton_Click"/>
-            <Button Name="SaveButton" Content="Save" Click="SaveButton_Click" Background="#FF5722" Foreground="White" Margin="5"/>
+        <!-- Toolbar -->
+        <StackPanel Orientation="Horizontal" Background="#2D2D30" Height="60" VerticalAlignment="Top" HorizontalAlignment="Center">
+            <Button Name="TrimButton" Click="TrimButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <FontIcon Glyph="&#xE8C2;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button Name="AdjustSpeedButton" Click="AdjustSpeedButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <FontIcon Glyph="&#xEC4A;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button Name="PauseButton" Click="PauseButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <FontIcon Glyph="&#xE769;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button Name="ResumeButton" Click="ResumeButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <FontIcon Glyph="&#xE768;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button Name="PlayFromStartButton" Click="PlayFromStartButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <FontIcon Glyph="&#xF71A;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+            <Button Name="SaveButton" Click="SaveVideoButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
+                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                    <FontIcon Glyph="&#xE74E;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
+
+        <!-- Media Player -->
+        <MediaPlayerElement Name="PreviewControl" Stretch="UniformToFill" Grid.Row="1"/>
+
+        <!-- SeekBar -->
+        <Slider x:Name="SeekBar" Grid.Row="2" VerticalAlignment="Bottom" Margin="10" Minimum="0" Maximum="1000" ValueChanged="SeekBar_ValueChanged"/>
     </Grid>
 </Page>

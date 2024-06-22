@@ -15,6 +15,13 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text.Json;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Shapes;
+using System.ComponentModel;
+using Windows.Graphics.DirectX;
+using Windows.UI.Composition;
+using Windows.UI.Xaml.Hosting;
+using Windows.Graphics.Capture;
 
 namespace VideoRecordingCC
 {
@@ -24,7 +31,6 @@ namespace VideoRecordingCC
         private bool isFlipping = false;
         private bool isPreviewing;
         private bool isRecording = false;
-        //private bool isPaused;
         private bool enabledAudio = false;
         private StorageFile recordedFile;
         private List<VideoSetting> AvailableVideoSetting = new List<VideoSetting>();
@@ -97,7 +103,6 @@ namespace VideoRecordingCC
             await mediaCapture.StartRecordToStorageFileAsync(MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Auto), recordedFile);
 
             isRecording = true;
-            RecordButton.Content = "Stop Recording";
         }
 
         private async Task StopRecordingAsync()
@@ -105,7 +110,6 @@ namespace VideoRecordingCC
             await mediaCapture.StopRecordAsync();
 
             isRecording = false;
-            RecordButton.Content = "Start Recording";
 
             var dialog = new ContentDialog
             {
@@ -123,10 +127,25 @@ namespace VideoRecordingCC
         {
             if (isRecording)
             {
+                RecordButtonContent.Content = new Ellipse
+                {
+                    Width = 30,
+                    Height = 30,
+                    Fill = new SolidColorBrush(Windows.UI.Colors.Red),
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
                 await StopRecordingAsync();
             }
             else
             {
+                RecordEllipse.Fill = new SolidColorBrush(Windows.UI.Colors.Gray);
+                RecordButtonContent.Content = new Rectangle
+                {
+                    Width = 30,
+                    Height = 30,
+                    Fill = new SolidColorBrush(Windows.UI.Colors.Red),
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
                 await StartRecordingAsync();
             }
 
@@ -146,10 +165,29 @@ namespace VideoRecordingCC
 
         private async void AudioToggleButton_Click(object sender, RoutedEventArgs e)
         {
-            ToggleButton toggleButton = (ToggleButton)sender;
-            enabledAudio = toggleButton.IsChecked ?? false;
-
-            AudioToggleButton.Content = enabledAudio ? "Disable Audio" : "Enable Audio";
+            enabledAudio = !enabledAudio;
+            if (enabledAudio)
+            {
+                AudioButtonContent.Content = new FontIcon
+                {
+                    Glyph = "\uF12E",  // Use Unicode escape sequence without the '&#x' prefix
+                    FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"),  // Specify FontFamily correctly
+                    Foreground = new SolidColorBrush(Windows.UI.Colors.White),  // Use SolidColorBrush to set Foreground
+                    FontSize = 24,
+                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center,  // Use HorizontalAlignment enum value
+                };
+            }
+            else
+            {
+                AudioButtonContent.Content = new FontIcon
+                {
+                    Glyph = "\uE720",  
+                    FontFamily = new Windows.UI.Xaml.Media.FontFamily("Segoe MDL2 Assets"),  
+                    Foreground = new SolidColorBrush(Windows.UI.Colors.White),  
+                    FontSize = 24,
+                    HorizontalAlignment = Windows.UI.Xaml.HorizontalAlignment.Center,
+                };
+            }
 
             await InitializeMediaCaptureAsync();
             await Task.Delay(500);

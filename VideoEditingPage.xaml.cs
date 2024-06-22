@@ -8,6 +8,7 @@ using Windows.Media.MediaProperties;
 using Windows.Media.Playback;
 using Windows.Media.Transcoding;
 using Windows.Storage;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -112,33 +113,90 @@ namespace VideoRecordingCC
             }
         }
 
-        private async void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveVideoButton_Click(object sender, RoutedEventArgs e)
         {
-            // Create the file in the Videos library with a unique name
-            StorageFile resultFile = await KnownFolders.VideosLibrary.CreateFileAsync("editedVideo.mp4", CreationCollisionOption.GenerateUniqueName);
-
-            // Create a MediaEncodingProfile for MP4 format
-            //MediaEncodingProfile encodingProfile = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.HD720p);
-
-            // Render the composition to the file
-
-            IAsyncOperationWithProgress<TranscodeFailureReason, double> saveOperation;
-
-            saveOperation =  _composition.RenderToFileAsync(resultFile);
-
-            //saveOperation.Progress = new AsyncOperationProgressHandler<TranscodeFailureReason, double>();
-            //.Debug.WriteLine($"Render {result.ToString()}");
-
-            // Show a dialog to inform the user that the video has been saved
-            var dialog = new ContentDialog
+            try
             {
-                Title = "Media Composition Saved",
-                Content = $"Video saved to {resultFile.Path}",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot,
-            };
+                // Create the file in the Videos library with a unique name
+                StorageFile resultFile = await KnownFolders.VideosLibrary.CreateFileAsync("editedVideo.mp4", CreationCollisionOption.GenerateUniqueName);
 
-            await dialog.ShowAsync();
+                // Create a MediaEncodingProfile for MP4 format
+                //MediaEncodingProfile encodingProfile = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.HD720p);
+
+                // Render the composition to the file
+
+                IAsyncOperationWithProgress<TranscodeFailureReason, double> saveOperation;
+
+                MediaTranscoder transcoder = new MediaTranscoder();
+                MediaEncodingProfile profile = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.HD720p);
+                transcoder.HardwareAccelerationEnabled = true;
+                transcoder.VideoProcessingAlgorithm = MediaVideoProcessingAlgorithm.Default;
+
+                using (var outstream = await resultFile.OpenAsync(FileAccessMode.ReadWrite)) {
+                    PrepareTranscodeResult prepareOp = await transcoder.PrepareMediaStreamSourceTranscodeAsync(_composition.GenerateMediaStreamSource(), outstream, profile);
+
+                    if (prepareOp.CanTranscode)
+                    {
+                        var transcodeOp = prepareOp.TranscodeAsync();
+                        transcodeOp.Progress = new AsyncActionProgressHandler<double>((info, progress) => {
+                            Debug.WriteLine($"Rendering... Progress: {progress:F0}%");
+                        });
+                        await transcodeOp;
+                        //transcodeOp.Completed = new AsyncActionWithProgressCompletedHandler<double>((info, status) => {
+                        //    var results = info.
+                        //    if (results != TranscodeFailureReason.None || status != AsyncStatus.Completed)
+                        //    {
+                        //        Debug.WriteLine("Failure");
+                        //    }
+                        //    else
+                        //    {
+                        //        Debug.WriteLine("Succeed");
+                        //    }
+                        //});
+                    }
+                }
+
+                //saveOperation = _composition.RenderToFileAsync(resultFile);
+                //saveOperation.Progress = async (info, progress) =>
+                //{
+                //    await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, new DispatchedHandler(() =>
+                //    {
+                //        Debug.WriteLine($"Rendering... Progress: {progress:F0}%");
+                //    }));
+                //};
+                //saveOperation.Completed = new AsyncOperationWithProgressCompletedHandler<TranscodeFailureReason, double>((info, status) =>
+                //{
+                //    var results = info.GetResults();
+                //    if (results != TranscodeFailureReason.None || status != AsyncStatus.Completed)
+                //    {
+                //        Debug.WriteLine("Failure");
+                //    }
+                //    else
+                //    {
+                //        Debug.WriteLine("Succeed");
+                //    }
+                //});
+                //await saveOperation;
+
+                //saveOperation.Progress = new AsyncOperationProgressHandler<TranscodeFailureReason, double>();
+                //Debug.WriteLine($"Render {_composition}");
+                var dialog = new ContentDialog
+                {
+                    Title = "Media Composition Saved",
+                    Content = $"Video saved to {resultFile.Path}",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.Content.XamlRoot,
+                };
+
+                await dialog.ShowAsync();
+
+                // Show a dialog to inform the user that the video has been saved
+            }
+            catch (Exception ex) 
+            {
+                Debug.WriteLine(ex);
+            }
+
 
             // Navigate back to the main page
             Frame.Navigate(typeof(MainPage));

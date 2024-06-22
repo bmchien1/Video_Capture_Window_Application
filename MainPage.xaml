@@ -5,30 +5,52 @@
     xmlns:local="using:VideoRecordingCC">
 
     <Grid Background="#1E1E1E">
+
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        <!-- Toolbar -->
+        <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" Background="#2D2D30">
 
-        <CaptureElement Name="PreviewControl" Stretch="UniformToFill"/>
+            <StackPanel Orientation="Horizontal" Background="#2D2D30" Height="60" VerticalAlignment="Top" HorizontalAlignment="Center">
+                <Button Name="RecordButton" Click="RecordButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                        <ContentControl Name="RecordButtonContent">
+                            <Ellipse x:Name="RecordEllipse" Width="30" Height="30" Fill="Red" HorizontalAlignment="Center"/>
+                        </ContentControl>
+                    </StackPanel>
+                </Button>
 
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="10">
-            <Button Name="RecordButton" Content="Start Recording" Click="RecordButton_Click" Background="#FF4081" Foreground="White" Margin="5"/>
-            <Button Name="FlipButton" Content="Flip Camera" Click="FlipCamera_Click" Background="#3F51B5" Foreground="White" Margin="5"/>
-            <ToggleButton x:Name="AudioToggleButton" Content="Enable Audio" Click="AudioToggleButton_Click" Background="#009688" Foreground="White" Margin="5"/>
-            <Button Name="MenuButton" Background="Transparent" Foreground="White" Margin="5">
-                <TextBlock Text="&#x22EE;" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <Button.Flyout>
-                    <MenuFlyout>
-                        <MenuFlyoutItem Text="Settings" Click="OpenSettingsButton_Click"/>
-                        <MenuFlyoutItem Text="Edit Video" Click="EditVideoButton_Click"/>
-                        <!-- Add other menu items here -->
-                    </MenuFlyout>
-                </Button.Flyout>
-            </Button>
+                <!--<Button Name="ScreenCaptureButton" Click="ScreenCaptureButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
+                    <FontIcon Glyph="&#xE722;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
+                </Button>-->
+                
+                <Button Name="AudioButton" Click="AudioToggleButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                        <ContentControl Name="AudioButtonContent">
+                            <FontIcon Glyph="&#xE720;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
+                        </ContentControl>
+                    </StackPanel>
+                </Button>
 
-        <!--<Button Name="OpenSettingsButton" Content="Settings" Click="OpenSettingsButton_Click"/>-->
-            <!--<Button Name="ComposeButton" Content="Compose Media" Click="ComposeButton_Click" Background="#607D8B" Foreground="White" Margin="5"/>-->
+                <Button Name="FlipButton" Click="FlipCamera_Click" Width="50" Height="50" Margin="5" Background="Transparent">
+                    <FontIcon Glyph="&#xE89E;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
+                </Button>
+
+                <Button Name="EditButton" Click="EditVideoButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
+                    <FontIcon Glyph="&#xE70F;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
+                </Button>
+
+                <Button Name="SettingsButton" Click="OpenSettingsButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
+                    <FontIcon Glyph="&#xE713;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
+                </Button>
+            </StackPanel>
         </StackPanel>
+
+        <!-- Preview Area -->
+        <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="10,0,10,10">
+            <CaptureElement Name="PreviewControl" Stretch="UniformToFill"/>
+        </Border>
     </Grid>
 </Page>
