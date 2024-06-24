@@ -178,6 +178,9 @@
     <PackageReference Include="System.Text.Json">
       <Version>8.0.3</Version>
     </PackageReference>
+    <PackageReference Include="Win2D.uwp">
+      <Version>1.27.1</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="CustomVideoEffects">

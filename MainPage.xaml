@@ -45,6 +45,8 @@
                 <Button Name="SettingsButton" Click="OpenSettingsButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
                     <FontIcon Glyph="&#xE713;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
                 </Button>
+                <Button x:Name="ScreenCaptureButton" Content="Capture Screen" Click="ScreenCaptureButton_Click"/>
+
             </StackPanel>
         </StackPanel>
 

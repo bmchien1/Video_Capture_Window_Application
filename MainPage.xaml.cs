@@ -22,6 +22,10 @@ using Windows.Graphics.DirectX;
 using Windows.UI.Composition;
 using Windows.UI.Xaml.Hosting;
 using Windows.Graphics.Capture;
+using Windows.Graphics.DirectX.Direct3D11;
+using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas.UI.Composition;
+using Windows.Media.Core;
 
 namespace VideoRecordingCC
 {
@@ -35,6 +39,14 @@ namespace VideoRecordingCC
         private StorageFile recordedFile;
         private List<VideoSetting> AvailableVideoSetting = new List<VideoSetting>();
         private string CurrentVideoSetting = null;
+
+        private GraphicsCaptureItem captureItem;
+        private CanvasDevice canvasDevice;
+        private CanvasSwapChain swapChain;
+        private Direct3D11CaptureFramePool framePool;
+        private GraphicsCaptureSession captureSession;
+
+        private bool isCapturingScreen = false;
 
         public MainPage()
         {
@@ -127,17 +139,29 @@ namespace VideoRecordingCC
         {
             if (isRecording)
             {
-                RecordButtonContent.Content = new Ellipse
-                {
-                    Width = 30,
-                    Height = 30,
-                    Fill = new SolidColorBrush(Windows.UI.Colors.Red),
-                    HorizontalAlignment = HorizontalAlignment.Center
-                };
-                await StopRecordingAsync();
+                //if (isCapturingScreen)
+                //{
+                //    frameServerDest.StopRecording();
+                //}
+                //else
+                //{
+                    RecordButtonContent.Content = new Ellipse
+                    {
+                        Width = 30,
+                        Height = 30,
+                        Fill = new SolidColorBrush(Windows.UI.Colors.Red),
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    };
+                    await StopRecordingAsync();
+                //}
             }
-            else
-            {
+            else 
+            //if (isCapturingScreen)
+            //{
+            //    await StartScreenRecordingAsync();
+            //}
+            //else
+            //{
                 RecordEllipse.Fill = new SolidColorBrush(Windows.UI.Colors.Gray);
                 RecordButtonContent.Content = new Rectangle
                 {
@@ -147,8 +171,7 @@ namespace VideoRecordingCC
                     HorizontalAlignment = HorizontalAlignment.Center
                 };
                 await StartRecordingAsync();
-            }
-
+            //}
         }
 
         private async void FlipCamera_Click(object sender, RoutedEventArgs e)
@@ -233,48 +256,99 @@ namespace VideoRecordingCC
             }
         }
 
-        private async void ComposeButton_Click(object sender, RoutedEventArgs e)
+        private async void ScreenCaptureButton_Click(object sender, RoutedEventArgs e)
         {
-            await ComposeAndEditMediaAsync();
-        }
-
-        private async Task ComposeAndEditMediaAsync()
-        {
-            // Create a new MediaComposition
-            MediaComposition composition = new MediaComposition();
-
-            // Add a video clip
-            StorageFile videoFile = await KnownFolders.VideosLibrary.GetFileAsync("sample.mp4");
-            MediaClip videoClip = await MediaClip.CreateFromFileAsync(videoFile);
-            composition.Clips.Add(videoClip);
-
-            // Add background music
-            StorageFile audioFile = await KnownFolders.MusicLibrary.GetFileAsync("background.mp3");
-            MediaClip audioClip = await MediaClip.CreateFromFileAsync(audioFile);
-            audioClip.Volume = 0.5; // Set the volume of the background music
-            composition.Clips.Add(audioClip);
-
-            // Save the composition to a file
-            StorageFile resultFile = await KnownFolders.VideosLibrary.CreateFileAsync("editedVideo.mp4", CreationCollisionOption.GenerateUniqueName);
-            await composition.RenderToFileAsync(resultFile, MediaTrimmingPreference.Precise);
-
-            // Notify user
-            var dialog = new ContentDialog
+            if (isCapturingScreen)
             {
-                Title = "Media Composition Saved",
-                Content = $"Video saved to {resultFile.Path}",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot,
-            };
-
-            await dialog.ShowAsync();
+                StopScreenCapture();
+            }
+            else
+            {
+                await StartScreenCaptureAsync();
+            }
         }
 
-        //private async void SettingsPage_SettingsSaved(object sender, EventArgs e)
+        //private async Task StartScreenRecordingAsync()
         //{
-        //    // Re-initialize media capture with the updated settings
-        //    await InitializeMediaCaptureAsync();
+        //    recordedFile = await KnownFolders.VideosLibrary.CreateFileAsync("screenRecording.mp4", CreationCollisionOption.GenerateUniqueName);
+
+        //    var mediaComposition = new MediaComposition();
+        //    var mediaStreamSource = await CreateMediaStreamSourceAsync();
+
+        //    var mediaEncodingProfile = MediaEncodingProfile.CreateMp4(VideoEncodingQuality.Auto);
+        //    await mediaComposition.RenderToFileAsync(recordedFile, MediaTrimmingPreference.Precise, mediaEncodingProfile);
         //}
+
+        //private async Task<MediaStreamSource> CreateMediaStreamSourceAsync()
+        //{
+        //    var frameServerDest = new FrameServerDest(canvasDevice);
+        //    frameServerDest.StartServer(captureItem);
+
+        //    var mediaStreamSource = frameServerDest.CreateMediaStreamSource();
+        //    return mediaStreamSource;
+        //}
+
+        private async Task StartScreenCaptureAsync()
+        {
+            var picker = new GraphicsCapturePicker();
+            captureItem = await picker.PickSingleItemAsync();
+
+            if (captureItem != null)
+            {
+                canvasDevice = CanvasDevice.GetSharedDevice();
+                swapChain = new CanvasSwapChain(canvasDevice, captureItem.Size.Width, captureItem.Size.Height, 96);
+                var compositionGraphicsDevice = CanvasComposition.CreateCompositionGraphicsDevice(Window.Current.Compositor, canvasDevice);
+                var compositionSurface = compositionGraphicsDevice.CreateDrawingSurface(
+                    new Windows.Foundation.Size(captureItem.Size.Width, captureItem.Size.Height),
+                    Windows.Graphics.DirectX.DirectXPixelFormat.B8G8R8A8UIntNormalized,
+                    Windows.Graphics.DirectX.DirectXAlphaMode.Premultiplied);
+
+                var visual = ElementCompositionPreview.GetElementVisual(PreviewControl);
+                var compositor = visual.Compositor;
+                var surfaceBrush = compositor.CreateSurfaceBrush(compositionSurface);
+                var spriteVisual = compositor.CreateSpriteVisual();
+                spriteVisual.Brush = surfaceBrush;
+                spriteVisual.Size = new System.Numerics.Vector2((float)captureItem.Size.Width, (float)captureItem.Size.Height);
+                ElementCompositionPreview.SetElementChildVisual(PreviewControl, spriteVisual);
+
+                framePool = Direct3D11CaptureFramePool.Create(
+                    canvasDevice,
+                    DirectXPixelFormat.B8G8R8A8UIntNormalized,
+                    2,
+                    captureItem.Size);
+                framePool.FrameArrived += (s, a) =>
+                {
+                    using (var frame = framePool.TryGetNextFrame())
+                    {
+                        using (var canvasBitmap = CanvasBitmap.CreateFromDirect3D11Surface(canvasDevice, frame.Surface))
+                        using (var ds = CanvasComposition.CreateDrawingSession(compositionSurface))
+                        {
+                            ds.DrawImage(canvasBitmap);
+                        }
+                        swapChain.Present();
+                    }
+                };
+
+                captureSession = framePool.CreateCaptureSession(captureItem);
+                captureSession.StartCapture();
+
+                isCapturingScreen = true;
+            }
+        }
+
+        private void StopScreenCapture()
+        {
+            captureSession?.Dispose();
+            framePool?.Dispose();
+            canvasDevice = null;
+            swapChain = null;
+            captureItem = null;
+
+            ElementCompositionPreview.SetElementChildVisual(PreviewControl, null);
+            isCapturingScreen = false;
+
+            InitializeMediaCaptureAsync();
+        }
 
         private void CheckIfStreamsAreIdentical()
         {
@@ -358,6 +432,7 @@ namespace VideoRecordingCC
             public string Display;
             public StreamPropertiesHelper property;
         }
+
     }
 }
 
