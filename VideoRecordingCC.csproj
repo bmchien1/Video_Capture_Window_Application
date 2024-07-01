@@ -122,7 +122,9 @@
     <Compile Include="BlankPage1.xaml.cs">
       <DependentUpon>BlankPage1.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CaptureHelper.cs" />
     <Compile Include="Class1.cs" />
+    <Compile Include="FrameServerDest.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

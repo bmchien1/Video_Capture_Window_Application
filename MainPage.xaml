@@ -11,7 +11,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <!-- Toolbar -->
-        <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" Background="#2D2D30">
+        <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" Width="1920" Background="#2D2D30">
 
             <StackPanel Orientation="Horizontal" Background="#2D2D30" Height="60" VerticalAlignment="Top" HorizontalAlignment="Center">
                 <Button Name="RecordButton" Click="RecordButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
@@ -46,7 +46,12 @@
                     <FontIcon Glyph="&#xE713;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
                 </Button>
                 <Button x:Name="ScreenCaptureButton" Content="Capture Screen" Click="ScreenCaptureButton_Click"/>
-
+                
+                <ComboBox Name="EffectPicker" SelectionChanged="EffectPicker_SelectionChanged" Width="150" Height="50" Margin="5" Background="Transparent">
+                    <ComboBoxItem Content="No Effect"/>
+                    <ComboBoxItem Content="Grayscale"/>
+                    <ComboBoxItem Content="Sepia"/>
+                </ComboBox>
             </StackPanel>
         </StackPanel>
 

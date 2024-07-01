@@ -76,15 +76,6 @@ namespace VideoRecordingCC
             }
         }
 
-        private void TrimButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (_composition.Clips.Count > 0)
-            {
-                _composition.Clips[0].TrimTimeFromStart = TimeSpan.FromSeconds(2);
-                _composition.Clips[0].TrimTimeFromEnd = TimeSpan.FromSeconds(2);
-                _mediaPlayer.Source = MediaSource.CreateFromMediaStreamSource(_composition.GenerateMediaStreamSource());
-            }
-        }
 
         private void AdjustSpeedButton_Click(object sender, RoutedEventArgs e)
         {

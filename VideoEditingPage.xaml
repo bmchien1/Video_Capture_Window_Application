@@ -16,11 +16,6 @@
 
         <!-- Toolbar -->
         <StackPanel Orientation="Horizontal" Background="#2D2D30" Height="60" VerticalAlignment="Top" HorizontalAlignment="Center">
-            <Button Name="TrimButton" Click="TrimButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                    <FontIcon Glyph="&#xE8C2;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>
-                </StackPanel>
-            </Button>
             <Button Name="AdjustSpeedButton" Click="AdjustSpeedButton_Click" Width="50" Height="50" Margin="5" Background="Transparent">
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                     <FontIcon Glyph="&#xEC4A;" FontFamily="Segoe MDL2 Assets" Foreground="White" FontSize="24" HorizontalAlignment="Center"/>

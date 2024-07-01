@@ -67,17 +67,6 @@ namespace VideoRecordingCC
                     SetPreviewSettings(CurrentVideoSetting);
                 }
             }
-            //foreach (VideoSetting setting in AvailableVideoSetting)
-            //{
-            //    Debug.WriteLine(setting.Display);
-            //    if (CurrentVideoSetting.Equals(setting.Display))
-            //    {
-            //        Debug.WriteLine(CurrentVideoSetting);
-            //        var encodingProperties = (setting.property as StreamPropertiesHelper).EncodingProperties;
-            //        mediaCapture.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.VideoPreview, encodingProperties);
-
-            //    }
-            //}
         }
 
         private async Task InitializeMediaCaptureAsync()
@@ -97,6 +86,7 @@ namespace VideoRecordingCC
                 var videoEffectDefinition = new VideoEffectDefinition("CustomVideoEffects.Flip");
                 IMediaExtension videoEffect = await mediaCapture.AddVideoEffectAsync(videoEffectDefinition, MediaStreamType.VideoPreview);
             }
+
             if (AvailableVideoSetting.Count() == 0)
             {
                 PopulateStreamPropertiesUI(MediaStreamType.VideoPreview);
@@ -253,6 +243,51 @@ namespace VideoRecordingCC
                 };
 
                 await dialog.ShowAsync();
+            }
+        }
+
+        private async void EffectPicker_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox comboBox = sender as ComboBox;
+            if (comboBox != null && comboBox.SelectedItem != null)
+            {
+                ComboBoxItem selectedItem = comboBox.SelectedItem as ComboBoxItem;
+                if (selectedItem != null)
+                {
+                    string selectedEffect = selectedItem.Content as string;
+                    await ApplyEffectAsync(selectedEffect);
+                }
+            }
+        }
+
+        private async Task ApplyEffectAsync(string effectName)
+        {
+            await mediaCapture.ClearEffectsAsync(MediaStreamType.VideoPreview);
+            if (isFlipping)
+            {
+                if (effectName == "Grayscale")
+                {
+                    var definition = new VideoEffectDefinition(typeof(CustomVideoEffects.GrayscaleFlip).FullName);
+                    await mediaCapture.AddVideoEffectAsync(definition, MediaStreamType.VideoPreview);
+                }
+                else if (effectName == "Sepia")
+                {
+                    var definition = new VideoEffectDefinition(typeof(CustomVideoEffects.SepiaFlip).FullName);
+                    await mediaCapture.AddVideoEffectAsync(definition, MediaStreamType.VideoPreview);
+                }
+            }
+            else
+            {
+                if (effectName == "Grayscale")
+                {
+                    var definition = new VideoEffectDefinition(typeof(CustomVideoEffects.GrayscaleEffect).FullName);
+                    await mediaCapture.AddVideoEffectAsync(definition, MediaStreamType.VideoPreview);
+                }
+                else if (effectName == "Sepia")
+                {
+                    var definition = new VideoEffectDefinition(typeof(CustomVideoEffects.SepiaEffect).FullName);
+                    await mediaCapture.AddVideoEffectAsync(definition, MediaStreamType.VideoPreview);
+                }
             }
         }
 
@@ -426,13 +461,13 @@ namespace VideoRecordingCC
                 await mediaCapture.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.VideoRecord, encodingProperties);
             }
         }
-
         class VideoSetting
         {
             public string Display;
             public StreamPropertiesHelper property;
         }
 
-    }
+
+    }        
 }
 
